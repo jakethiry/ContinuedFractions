@@ -1,0 +1,1442 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Continued Fractions — Havens & Elsner</title>
+<link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Source+Sans+3:wght@300;400;500;600&family=Source+Serif+4:ital,opsz,wght@0,8..60,300;0,8..60,400;0,8..60,600;1,8..60,300;1,8..60,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"
+  onload="renderMathInElement(document.body,{delimiters:[{left:'\\[',right:'\\]',display:true},{left:'\\(',right:'\\)',display:false}],throwOnError:false})">
+</script>
+<style>
+  :root {
+    --white:       #ffffff;
+    --off-white:   #f7f8fa;
+    --bg-soft:     #eef1f6;
+    --rule:        #d8dde8;
+    --rule-strong: #b8c0d0;
+    --text:        #2c3140;
+    --text-soft:   #4e5668;
+    --text-muted:  #8690a4;
+    --navy:        #1e3a5f;
+    --navy-mid:    #2d5288;
+    --blue-acc:    #3b72c4;
+    --blue-light:  #e8f0fc;
+    --gold:        #c4972a;
+    --gold-light:  #f5eddb;
+    --springer-yellow: #f5c800;
+    --radius:      4px;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--off-white);
+    color: var(--text);
+    font-family: 'Source Sans 3', sans-serif;
+    font-size: 16px;
+    line-height: 1.7;
+    min-height: 100vh;
+  }
+
+  .topbar {
+    background: var(--navy);
+    padding: 9px 0;
+    text-align: center;
+  }
+  .topbar-inner {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    font-size: 0.78rem;
+    letter-spacing: 0.09em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.55);
+  }
+  .topbar-inner span { color: var(--springer-yellow); }
+
+  .site-header {
+    background: var(--white);
+    border-bottom: 1px solid var(--rule);
+  }
+
+  .header-inner {
+    max-width: 1060px;
+    margin: 0 auto;
+    padding: 40px 48px 36px;
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 40px;
+    align-items: start;
+  }
+
+  .book-cover-mock {
+    width: 138px;
+    background: #f5c800;
+    padding: 14px 13px 16px;
+    box-shadow: 4px 6px 20px rgba(30,58,95,0.18), 1px 1px 0 rgba(0,0,0,0.06);
+    flex-shrink: 0;
+  }
+
+  .cover-series {
+    font-size: 0.54rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: rgba(30,58,95,0.7);
+    margin-bottom: 8px;
+    line-height: 1.4;
+  }
+
+  .cover-title {
+    font-family: 'Libre Baskerville', serif;
+    font-size: 1rem;
+    font-weight: 700;
+    color: #8b1a00;
+    line-height: 1.25;
+    margin-bottom: 6px;
+  }
+
+  .cover-subtitle-small {
+    font-size: 0.58rem;
+    color: rgba(30,58,95,0.65);
+    line-height: 1.4;
+    font-style: italic;
+    margin-bottom: 12px;
+  }
+
+  .cover-authors-small {
+    font-size: 0.58rem;
+    color: rgba(30,58,95,0.7);
+    line-height: 1.5;
+    margin-bottom: 10px;
+  }
+
+  .cover-oa {
+    display: inline-block;
+    font-size: 0.5rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    background: var(--navy);
+    color: var(--white);
+    padding: 2px 6px;
+    margin-bottom: 6px;
+  }
+
+  .cover-springer {
+    font-size: 0.62rem;
+    font-weight: 600;
+    color: var(--navy);
+    letter-spacing: 0.04em;
+  }
+
+  .publisher-tag {
+    font-size: 0.72rem;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--blue-acc);
+    margin-bottom: 10px;
+    display: block;
+  }
+
+  h1.main-title {
+    font-family: 'Libre Baskerville', serif;
+    font-size: clamp(1.55rem, 3vw, 2.2rem);
+    font-weight: 700;
+    color: var(--navy);
+    line-height: 1.2;
+    margin-bottom: 7px;
+  }
+
+  h1.main-title em { font-style: italic; color: var(--navy-mid); }
+
+  .book-subtitle-line {
+    font-family: 'Source Serif 4', serif;
+    font-size: 1rem;
+    font-style: italic;
+    font-weight: 300;
+    color: var(--text-soft);
+    margin-bottom: 20px;
+  }
+
+  .authors-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-bottom: 20px;
+  }
+
+  .author-chip {
+    background: var(--blue-light);
+    border: 1px solid rgba(59,114,196,0.2);
+    border-radius: 2px;
+    padding: 4px 14px;
+    font-size: 0.88rem;
+    font-weight: 500;
+    color: var(--navy-mid);
+  }
+
+  .authors-row .amp { color: var(--text-muted); font-size: 0.9rem; }
+
+  .meta-row {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+
+  .meta-pill {
+    font-size: 0.76rem;
+    color: var(--text-soft);
+    background: var(--off-white);
+    border: 1px solid var(--rule);
+    padding: 4px 12px;
+    border-radius: 20px;
+  }
+
+  /* ── TABS ── */
+  .tab-nav {
+    background: var(--white);
+    border-bottom: 2px solid var(--rule);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+
+  .tab-nav-inner {
+    max-width: 1060px;
+    margin: 0 auto;
+    padding: 0 48px;
+    display: flex;
+  }
+
+  .tab-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-family: 'Source Sans 3', sans-serif;
+    font-size: 0.84rem;
+    font-weight: 600;
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    padding: 14px 20px 12px;
+    border-bottom: 2px solid transparent;
+    position: relative;
+    bottom: -2px;
+    transition: color 0.15s, border-color 0.15s;
+  }
+
+  .tab-btn:hover { color: var(--navy-mid); }
+  .tab-btn.active { color: var(--navy); border-bottom-color: var(--blue-acc); }
+
+  /* ── PAGE WRAPPER ── */
+  .page-inner {
+    max-width: 1060px;
+    margin: 0 auto;
+    padding: 0 48px;
+  }
+
+  .tab-panel { display: none; }
+  .tab-panel.active { display: block; animation: fadeIn 0.32s ease both; }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ════════════════ BOOK TAB ════════════════ */
+  .book-layout {
+    display: grid;
+    grid-template-columns: 1fr 292px;
+    gap: 48px;
+    padding: 44px 0 64px;
+    align-items: start;
+  }
+
+  .sec-head {
+    font-family: 'Libre Baskerville', serif;
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--navy);
+    padding-bottom: 10px;
+    border-bottom: 2px solid var(--bg-soft);
+    margin-bottom: 18px;
+    margin-top: 34px;
+  }
+  .sec-head:first-child { margin-top: 0; }
+
+  .book-main p {
+    font-family: 'Source Serif 4', serif;
+    font-size: 0.99rem;
+    font-weight: 300;
+    color: var(--text-soft);
+    margin-bottom: 1em;
+    line-height: 1.82;
+  }
+
+  .book-main p strong { color: var(--text); font-weight: 600; }
+
+  .topics-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 9px;
+    margin: 14px 0 26px;
+  }
+
+  .topic-item {
+    background: var(--white);
+    border: 1px solid var(--rule);
+    border-left: 3px solid var(--blue-acc);
+    padding: 9px 13px;
+    font-size: 0.86rem;
+    color: var(--text-soft);
+    line-height: 1.45;
+  }
+
+  .topic-item strong {
+    display: block;
+    font-size: 0.73rem;
+    font-weight: 700;
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-bottom: 2px;
+  }
+
+  /* Sidebar */
+  .book-sidebar {}
+
+  .oa-badge {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    background: var(--gold-light);
+    border: 1px solid rgba(196,151,42,0.28);
+    border-radius: var(--radius);
+    padding: 11px 14px;
+    margin-bottom: 16px;
+    font-size: 0.82rem;
+    color: #7a5a0a;
+    font-weight: 500;
+    line-height: 1.4;
+  }
+
+  .sidebar-card {
+    background: var(--white);
+    border: 1px solid var(--rule);
+    border-radius: var(--radius);
+    padding: 20px 18px;
+    margin-bottom: 16px;
+  }
+
+  .sidebar-card h3 {
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-bottom: 12px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--bg-soft);
+  }
+
+  .sidebar-list { list-style: none; padding: 0; }
+
+  .sidebar-list li {
+    font-size: 0.87rem;
+    color: var(--text-soft);
+    padding: 5px 0;
+    border-bottom: 1px solid var(--off-white);
+    line-height: 1.45;
+  }
+
+  .sidebar-list li:last-child { border-bottom: none; }
+
+  .sidebar-list li .lbl {
+    font-size: 0.68rem;
+    font-weight: 700;
+    letter-spacing: 0.09em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    display: block;
+    margin-bottom: 1px;
+  }
+
+  a { color: var(--blue-acc); text-decoration: none; transition: color 0.15s; }
+  a:hover { color: var(--navy); text-decoration: underline; }
+
+  /* ════════════════ AUTHORS TAB ════════════════ */
+  .authors-layout { padding: 44px 0 64px; }
+
+  .authors-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 28px;
+    margin-bottom: 36px;
+  }
+
+  .author-card {
+    background: var(--white);
+    border: 1px solid var(--rule);
+    border-radius: var(--radius);
+    overflow: hidden;
+  }
+
+  .author-card-head {
+    background: var(--navy);
+    padding: 20px 22px 17px;
+  }
+
+  .author-card-head h2 {
+    font-family: 'Libre Baskerville', serif;
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: var(--white);
+    margin-bottom: 3px;
+  }
+
+  .author-card-head p {
+    font-size: 0.8rem;
+    color: rgba(255,255,255,0.58);
+    line-height: 1.4;
+  }
+
+  .author-card-body { padding: 20px 22px; }
+
+  .author-card-body p {
+    font-family: 'Source Serif 4', serif;
+    font-size: 0.95rem;
+    font-weight: 300;
+    color: var(--text-soft);
+    margin-bottom: 0.95em;
+    line-height: 1.78;
+  }
+
+  .author-card-body p:last-child { margin-bottom: 0; }
+
+  .highlight-box {
+    background: var(--blue-light);
+    border: 1px solid rgba(59,114,196,0.2);
+    border-left: 3px solid var(--blue-acc);
+    padding: 13px 16px;
+    border-radius: 0 var(--radius) var(--radius) 0;
+    margin: 12px 0;
+  }
+
+  .highlight-box p {
+    font-size: 0.91rem !important;
+    color: var(--navy-mid) !important;
+    margin-bottom: 0 !important;
+  }
+
+  .research-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 12px; }
+
+  .tag {
+    font-size: 0.73rem;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    padding: 3px 9px;
+    border-radius: 20px;
+    background: var(--blue-light);
+    color: var(--navy-mid);
+    border: 1px solid rgba(59,114,196,0.18);
+  }
+
+  .collab-grid { columns: 2; column-gap: 16px; margin-top: 8px; }
+
+  .collab-grid li {
+    list-style: none;
+    font-size: 0.84rem;
+    color: var(--text-soft);
+    padding: 2px 0;
+    break-inside: avoid;
+  }
+
+  .pmp-callout {
+    background: var(--white);
+    border: 1px solid var(--rule);
+    border-radius: var(--radius);
+    border-left: 4px solid var(--blue-acc);
+    padding: 20px 24px;
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 20px;
+    align-items: center;
+  }
+
+  .pmp-callout-label {
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-bottom: 6px;
+  }
+
+  .pmp-callout p {
+    font-family: 'Source Serif 4', serif;
+    font-size: 0.95rem;
+    font-weight: 300;
+    color: var(--text-soft);
+    line-height: 1.72;
+    margin: 0;
+  }
+
+  .btn-primary {
+    display: inline-block;
+    background: var(--navy);
+    color: white;
+    font-size: 0.8rem;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    padding: 10px 20px;
+    border-radius: var(--radius);
+    text-decoration: none;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+
+  .btn-primary:hover { background: var(--navy-mid); color: white; text-decoration: none; }
+
+  /* ════════════════ ERRATA TAB ════════════════ */
+  .errata-layout { padding: 44px 0 64px; }
+
+  .errata-book-ref {
+    background: var(--white);
+    border: 1px solid var(--rule);
+    border-radius: var(--radius);
+    padding: 18px 22px;
+    margin-bottom: 32px;
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+  }
+
+  .errata-icon-circle {
+    width: 38px; height: 38px;
+    background: var(--blue-light);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.1rem;
+    color: var(--blue-acc);
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+
+  .errata-ref-text h2 {
+    font-family: 'Libre Baskerville', serif;
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--navy);
+    margin-bottom: 5px;
+  }
+
+  .errata-ref-text p {
+    font-size: 0.88rem;
+    color: var(--text-soft);
+    line-height: 1.55;
+  }
+
+  .errata-section { margin-bottom: 40px; }
+
+  .errata-sec-head {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid var(--bg-soft);
+    margin-bottom: 16px;
+  }
+
+  .errata-sec-head h3 {
+    font-family: 'Libre Baskerville', serif;
+    font-size: 1.07rem;
+    font-weight: 700;
+    color: var(--navy);
+  }
+
+  .badge {
+    font-size: 0.66rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    padding: 3px 9px;
+    border-radius: 20px;
+  }
+
+  .badge-sig { background: #fde8e4; color: #b53120; border: 1px solid rgba(181,49,32,0.22); }
+  .badge-minor { background: var(--bg-soft); color: var(--text-muted); border: 1px solid var(--rule); }
+
+  .erratum {
+    background: var(--white);
+    border: 1px solid var(--rule);
+    border-radius: var(--radius);
+    margin-bottom: 10px;
+    overflow: hidden;
+    transition: box-shadow 0.15s;
+  }
+
+  .erratum:hover { box-shadow: 0 2px 10px rgba(30,58,95,0.07); }
+  .erratum.sig { border-left: 4px solid #e05c42; }
+  .erratum.minor { border-left: 4px solid var(--rule-strong); }
+
+  .erratum-top {
+    padding: 11px 16px 10px;
+    border-bottom: 1px solid var(--off-white);
+  }
+
+  .erratum-loc {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.76rem;
+    color: var(--text-muted);
+  }
+
+  .erratum-body { padding: 13px 16px; }
+
+  .erratum-body p {
+    font-size: 0.91rem;
+    color: var(--text-soft);
+    margin-bottom: 9px;
+    line-height: 1.65;
+  }
+
+  .erratum-body p:last-child { margin-bottom: 0; }
+
+  .correction-block {
+    background: var(--off-white);
+    border: 1px solid var(--rule);
+    border-radius: var(--radius);
+    padding: 14px 20px;
+    margin-top: 9px;
+    font-family: 'Source Serif 4', serif;
+    font-size: 0.94rem;
+    font-weight: 300;
+    color: var(--text);
+    overflow-x: auto;
+    line-height: 1.8;
+  }
+
+  /* KaTeX display math inside correction blocks */
+  .correction-block .katex-display {
+    margin: 0.55em 0;
+    overflow-x: auto;
+    overflow-y: hidden;
+  }
+
+  .correction-block .katex { font-size: 1.05em; }
+  .erratum-body p .katex  { font-size: 1.0em; }
+
+  .correction-label {
+    font-family: 'Source Sans 3', sans-serif;
+    font-size: 0.69rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--gold);
+    display: block;
+    margin-bottom: 8px;
+  }
+
+  /* ════════════════ INTERVIEW TAB ════════════════ */
+  .interview-layout { padding: 44px 0 64px; }
+
+  .interview-header-card {
+    background: var(--white);
+    border: 1px solid var(--rule);
+    border-left: 4px solid var(--gold);
+    border-radius: var(--radius);
+    padding: 22px 24px;
+    margin-bottom: 36px;
+    display: flex;
+    align-items: flex-start;
+    gap: 18px;
+  }
+
+  .interview-icon-circle {
+    width: 46px; height: 46px;
+    background: var(--gold-light);
+    border: 1px solid rgba(196,151,42,0.3);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Libre Baskerville', serif;
+    font-size: 1.3rem;
+    font-style: italic;
+    color: var(--gold);
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+
+  .interview-header-text h2 {
+    font-family: 'Libre Baskerville', serif;
+    font-size: 1.18rem;
+    font-weight: 700;
+    color: var(--navy);
+    margin-bottom: 4px;
+  }
+
+  .interview-header-text p {
+    font-size: 0.87rem;
+    color: var(--text-soft);
+    line-height: 1.55;
+    margin: 0;
+  }
+
+  .interview-section {
+    margin-bottom: 38px;
+  }
+
+  .interview-section > p {
+    font-family: 'Source Serif 4', serif;
+    font-size: 0.97rem;
+    font-weight: 300;
+    color: var(--text-soft);
+    line-height: 1.82;
+    margin-bottom: 1em;
+  }
+
+  .interview-sec-head {
+    font-family: 'Libre Baskerville', serif;
+    font-size: 1.07rem;
+    font-weight: 700;
+    color: var(--navy);
+    padding-bottom: 10px;
+    border-bottom: 2px solid var(--bg-soft);
+    margin-bottom: 20px;
+  }
+
+  .qa-block {
+    background: var(--white);
+    border: 1px solid var(--rule);
+    border-radius: var(--radius);
+    margin-bottom: 12px;
+    overflow: hidden;
+  }
+
+  .qa-label {
+    font-size: 0.67rem;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    padding: 7px 16px;
+    display: block;
+  }
+
+  .qa-label-c {
+    background: var(--blue-light);
+    color: var(--navy-mid);
+    border-bottom: 1px solid rgba(59,114,196,0.15);
+  }
+
+  .qa-label-e {
+    background: var(--gold-light);
+    color: #7a5a0a;
+    border-bottom: 1px solid rgba(196,151,42,0.2);
+  }
+
+  .qa-body {
+    padding: 14px 18px;
+  }
+
+  .qa-body p {
+    font-family: 'Source Serif 4', serif;
+    font-size: 0.95rem;
+    font-weight: 300;
+    color: var(--text-soft);
+    line-height: 1.82;
+    margin-bottom: 0.9em;
+  }
+
+  .qa-body p:last-child { margin-bottom: 0; }
+
+  .conjecture-card {
+    background: var(--off-white);
+    border: 1px solid var(--rule);
+    border-left: 4px solid var(--gold);
+    border-radius: 0 var(--radius) var(--radius) 0;
+    padding: 18px 22px;
+    margin: 14px 0;
+  }
+
+  .conjecture-label {
+    font-size: 0.67rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 10px;
+    display: block;
+  }
+
+  .conjecture-card p {
+    font-family: 'Source Serif 4', serif;
+    font-size: 0.95rem;
+    font-weight: 300;
+    color: var(--text);
+    line-height: 1.8;
+    margin: 0;
+  }
+
+  .math-quote {
+    font-family: 'Libre Baskerville', serif;
+    font-style: italic;
+    font-size: 1.05rem;
+    color: var(--navy);
+    text-align: center;
+    border: none;
+    padding: 14px 0 4px;
+    margin: 0;
+  }
+
+  /* ── FOOTER ── */
+  footer {
+    background: var(--navy);
+    color: rgba(255,255,255,0.5);
+    padding: 26px 48px;
+    margin-top: 40px;
+  }
+
+  .footer-inner {
+    max-width: 1060px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 14px;
+  }
+
+  .footer-left { font-size: 0.82rem; line-height: 1.6; }
+  .footer-left strong { color: rgba(255,255,255,0.82); }
+  .footer-right { font-size: 0.78rem; text-align: right; }
+  .footer-right a { color: var(--springer-yellow); }
+
+  .link-btn {
+    background: none; border: none; padding: 0;
+    color: var(--blue-acc); cursor: pointer;
+    font-family: inherit; font-size: inherit;
+    text-decoration: underline;
+  }
+  .link-btn:hover { color: var(--navy); }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 820px) {
+    .header-inner, .book-layout, .authors-grid { grid-template-columns: 1fr; gap: 24px; }
+    .page-inner, .tab-nav-inner { padding: 0 20px; }
+    .header-inner { padding: 26px 20px; }
+    .topics-grid { grid-template-columns: 1fr; }
+    .tab-btn { padding: 12px 12px 10px; font-size: 0.8rem; }
+    footer { padding: 22px 20px; }
+    .footer-inner { flex-direction: column; align-items: flex-start; }
+    .footer-right { text-align: left; }
+    .pmp-callout { grid-template-columns: 1fr; }
+    .collab-grid { columns: 1; }
+  }
+</style>
+</head>
+<body>
+
+<!-- TOP BAR -->
+<div class="topbar">
+  <div class="topbar-inner">
+    <span>Springer / Birkhäuser</span> · Open Access Textbook · <span>2025</span>
+  </div>
+</div>
+
+<!-- HEADER -->
+<header class="site-header">
+  <div class="header-inner">
+
+    <div class="book-cover-mock">
+      <div class="cover-series">Springer · Mathematics</div>
+      <div class="cover-title">Continued Fractions</div>
+      <div class="cover-subtitle-small">A Modern and Classical Journey into the World of Siegel's Continued Fractions</div>
+      <div class="cover-authors-small">Carsten Elsner<br>Christopher Robin Havens</div>
+      <div class="cover-oa">Open Access</div><br>
+      <div class="cover-springer">⬡ Springer</div>
+    </div>
+
+    <div class="header-text">
+      <span class="publisher-tag">Springer / Birkhäuser · 2025</span>
+      <h1 class="main-title">Continued Fractions<br><em>A Modern and Classical Journey</em></h1>
+      <p class="book-subtitle-line">into the World of Siegel's Continued Fractions</p>
+      <div class="authors-row">
+        <span class="author-chip">Carsten Elsner</span>
+        <span class="amp">&amp;</span>
+        <span class="author-chip">Christopher Robin Havens</span>
+      </div>
+      <div class="meta-row">
+        <span class="meta-pill">Open Access</span>
+        <span class="meta-pill">Number Theory</span>
+        <span class="meta-pill">Published 2025</span>
+      </div>
+    </div>
+
+  </div>
+</header>
+
+<!-- TABS -->
+<nav class="tab-nav" role="tablist">
+  <div class="tab-nav-inner">
+    <button class="tab-btn active" role="tab" id="tab-book"      onclick="switchTab('book')">The Book</button>
+    <button class="tab-btn"        role="tab" id="tab-authors"  onclick="switchTab('authors')">Authors</button>
+    <button class="tab-btn"        role="tab" id="tab-interview" onclick="switchTab('interview')">Euler's Constant</button>
+    <button class="tab-btn"        role="tab" id="tab-errata"   onclick="switchTab('errata')">Errata</button>
+  </div>
+</nav>
+
+<div class="page-inner">
+
+<!-- ══════════════════════════════════════════
+     BOOK TAB
+══════════════════════════════════════════ -->
+<div id="panel-book" class="tab-panel active" role="tabpanel">
+  <div class="book-layout">
+
+    <div class="book-main">
+      <h2 class="sec-head">About the Book</h2>
+
+      <p>
+        <em>Continued Fractions: A Modern and Classical Journey into the World of Siegel's Continued Fractions</em> bridges nineteenth and early twentieth-century classical results with entirely modern, transducer-based approaches. The book offers a unified treatment through the lens of Siegel's theory, presenting both foundational theory and cutting-edge research in a single cohesive volume.
+      </p>
+
+      <p>
+        The text is accessible to advanced undergraduates and graduate students in mathematics, while simultaneously serving as a research reference for specialists in number theory, Diophantine approximation, and theoretical computer science. No prior knowledge of continued fractions is assumed — the necessary background is developed carefully from first principles.
+      </p>
+
+      <h2 class="sec-head">Topics Covered</h2>
+
+      <div class="topics-grid">
+        <div class="topic-item"><strong>Continued Fractions</strong>Classical theory, convergents &amp; Siegel's framework</div>
+        <div class="topic-item"><strong>Diophantine Approximation</strong>Approximation of real and transcendental numbers</div>
+        <div class="topic-item"><strong>Transducers &amp; Automata</strong>Modern computational approaches</div>
+        <div class="topic-item"><strong>Zopf Continued Fractions</strong>The remarkable [1; 2, 3, …] and its quadratic convergents</div>
+        <div class="topic-item"><strong>GCD Sequences</strong>Characteristic sequences and their properties</div>
+        <div class="topic-item"><strong>Linear Fractional Transforms</strong>Möbius transformations in the CF setting</div>
+      </div>
+
+      <p>
+        A distinctive feature is the treatment of the <strong>Zopf continued fraction [1; 2, 3, …]</strong> — a transcendental number whose continued fraction expansion exhibits remarkable algebraic properties. The authors develop its quadratic convergents from scratch and connect them to classical Siegel-type results via transducer machinery.
+      </p>
+
+      <h2 class="sec-head">Structure &amp; Approach</h2>
+
+      <p>
+        The book is divided into three main parts. The first establishes foundational theory: vector spaces of continued fractions, convergent sequences, and the Zopf framework. The second develops modern transducer-based machinery and its applications to Diophantine problems. The third presents advanced topics including gcd sequences, spectral properties, and connections to automata theory and cryptography.
+      </p>
+
+      <p>
+        Throughout, the authors take unusual care to motivate every definition and to connect classical tools with their modern counterparts. Proofs are given in full, and a rich collection of exercises accompanies each chapter.
+      </p>
+
+      <h2 class="sec-head">Access &amp; Publication</h2>
+
+      <p>
+        Published by <strong>Springer / Birkhäuser (2025)</strong> as part of the Open Access program. The electronic edition is freely and legally available. An errata sheet compiled by the authors is available on the <button class="link-btn" onclick="switchTab('errata')">Errata tab</button>.
+      </p>
+    </div>
+
+    <!-- SIDEBAR -->
+    <aside class="book-sidebar">
+      <div class="oa-badge">
+        🔓 Open Access — freely available via Springer
+      </div>
+
+      <div class="sidebar-card">
+        <h3>Publication Details</h3>
+        <ul class="sidebar-list">
+          <li><span class="lbl">Publisher</span>Springer / Birkhäuser</li>
+          <li><span class="lbl">Year</span>2025</li>
+          <li><span class="lbl">Authors</span>C. Elsner &amp; C. R. Havens</li>
+          <li><span class="lbl">Subject</span>Number Theory</li>
+          <li><span class="lbl">Access</span>Open Access</li>
+        </ul>
+      </div>
+
+      <div class="sidebar-card">
+        <h3>Key Topics</h3>
+        <ul class="sidebar-list">
+          <li>Siegel's continued fractions</li>
+          <li>Zopf CF &nbsp;[1; 2, 3, 4, …]</li>
+          <li>Quadratic convergents</li>
+          <li>Diophantine approximation</li>
+          <li>Transducers &amp; automata</li>
+          <li>Linear fractional transforms</li>
+          <li>Characteristic gcd sequences</li>
+        </ul>
+      </div>
+
+      <div class="sidebar-card">
+        <h3>Authors</h3>
+        <ul class="sidebar-list">
+          <li>
+            <span class="lbl">Carsten Elsner</span>
+            Professor Emeritus, FHDW Hannover
+          </li>
+          <li>
+            <span class="lbl">Christopher Robin Havens</span>
+            Staff Research Associate, UCLA
+          </li>
+        </ul>
+      </div>
+
+      <div class="sidebar-card">
+        <h3>Links</h3>
+        <ul class="sidebar-list">
+          <li><a href="https://prisonmathproject.org" target="_blank">Prison Mathematics Project</a></li>
+          <li><a href="https://www.springer.com" target="_blank">Springer Mathematics</a></li>
+        </ul>
+      </div>
+    </aside>
+
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     AUTHORS TAB
+══════════════════════════════════════════ -->
+<div id="panel-authors" class="tab-panel" role="tabpanel">
+  <div class="authors-layout">
+    <div class="authors-grid">
+
+      <!-- ELSNER -->
+      <div class="author-card">
+        <div class="author-card-head">
+          <h2>Carsten Elsner</h2>
+          <p>Professor Emeritus · FHDW Hannover, Germany<br>Institute for Theoretical Computer Science</p>
+        </div>
+        <div class="author-card-body">
+          <p>
+            Prof. Dr. Carsten Elsner studied mathematics and physics. His doctoral thesis (1990) focused on additive number theory — specifically on exceptional sets of Waring's problem for cubes — and his habilitation thesis (1997) addressed congruence conditions in the Diophantine approximation of real irrational numbers.
+          </p>
+          <p>
+            As a university professor, he spent most of his career teaching at <strong>FHDW Hannover</strong> at the Institute for Theoretical Computer Science, where he is now professor emeritus.
+          </p>
+          <div class="highlight-box">
+            <p>His research spans additive number theory, Diophantine approximation, continued fractions, transcendence theory, error sums, theta series, series transformations, and universal differential equations.</p>
+          </div>
+          <div class="research-tags">
+            <span class="tag">Additive Number Theory</span>
+            <span class="tag">Diophantine Approx.</span>
+            <span class="tag">Continued Fractions</span>
+            <span class="tag">Transcendence Theory</span>
+            <span class="tag">Theta Series</span>
+            <span class="tag">Fibonacci Series</span>
+          </div>
+          <div style="margin-top:18px;">
+            <div style="font-size:0.72rem; font-weight:700; letter-spacing:0.1em; text-transform:uppercase; color:var(--text-muted); margin-bottom:8px;">Selected Collaborators</div>
+            <ul class="collab-grid">
+              <li>D. Duverney</li><li>M. Kaneko</li>
+              <li>T. Komatsu</li><li>V. Kumar</li>
+              <li>F. Luca</li><li>Y. Nesterenko</li>
+              <li>M. Prévost</li><li>A. Sahai</li>
+              <li>J. Sander</li><li>S. Shimomura</li>
+              <li>I. Shiokawa</li><li>J. Steuding</li>
+              <li>Y. Tachiya</li><li>N. Technau</li>
+              <li>C. R. Havens</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <!-- HAVENS -->
+      <div class="author-card">
+        <div class="author-card-head">
+          <h2>Christopher Robin Havens</h2>
+          <p>Staff Research Associate · UCLA<br>Founder, Prison Mathematics Project</p>
+        </div>
+        <div class="author-card-body">
+          <p>
+            Christopher Robin Havens is a researcher in number theory specializing in continued fractions, Diophantine analysis, transducers, and their connections to automata and computational theory.
+          </p>
+          <p>
+            Entirely self-taught, Havens discovered mathematics while in solitary confinement. Beginning with basic algebra worksheets slipped under his cell door, he progressed through calculus and advanced topics via intensive self-study — often <strong>10+ hours a day</strong> — transforming his cell wall into an ever-evolving blackboard of formulas.
+          </p>
+          <div class="highlight-box">
+            <p>His first peer-reviewed paper appeared in <em>Research in Number Theory</em> (2020). His work explores the Zopf continued fraction [1; 2, 3, …], characteristic gcd sequences, and linear fractional transformations.</p>
+          </div>
+          <p>
+            From the Washington Corrections Center, Havens serves as <strong>Staff Research Associate at UCLA</strong>, contributing to cryptography research under the guidance of Professor <strong>Amit Sahai</strong>.
+          </p>
+          <div class="research-tags">
+            <span class="tag">Continued Fractions</span>
+            <span class="tag">Diophantine Analysis</span>
+            <span class="tag">Transducers</span>
+            <span class="tag">Automata Theory</span>
+            <span class="tag">Cryptography</span>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /authors-grid -->
+
+    <!-- PMP CALLOUT -->
+    <div class="pmp-callout">
+      <div>
+        <div class="pmp-callout-label">Prison Mathematics Project</div>
+        <p>Founded by Christopher Robin Havens, the Prison Mathematics Project is a 501(c)(3) nonprofit pairing incarcerated learners with volunteer mentors in topics from combinatorics to abstract algebra — embodying the conviction that mathematical insight arises wherever curiosity and rigor meet.</p>
+      </div>
+      <a href="https://prisonmathproject.org" target="_blank" class="btn-primary">Visit PMP →</a>
+    </div>
+
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     INTERVIEW TAB
+══════════════════════════════════════════ -->
+<div id="panel-interview" class="tab-panel" role="tabpanel">
+  <div class="interview-layout">
+
+    <div class="interview-header-card">
+      <div class="interview-icon-circle">γ</div>
+      <div class="interview-header-text">
+        <h2>A Conjecture on Euler's Constant</h2>
+        <p>Christopher Robin Havens &amp; Carsten Elsner · March 2026</p>
+        <p style="margin-top:6px;font-size:0.85rem;">
+          An interview exploring Carsten Elsner's four-decade pursuit of the irrationality of Euler's constant \(\gamma\), culminating in a single open conjecture about lattice basis reduction.
+        </p>
+        <div style="margin-top:14px;display:flex;gap:10px;flex-wrap:wrap;">
+          <a href="Euler_s_Constant.pdf" target="_blank" class="btn-primary" style="font-size:0.78rem;padding:8px 16px;">
+            ↓ Download Full Mathematical Paper (PDF)
+          </a>
+          <a href="On_Euler_s_Constant.pdf" target="_blank" class="btn-primary" style="background:var(--navy-mid);font-size:0.78rem;padding:8px 16px;">
+            ↓ Download This Interview (PDF)
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- BACKGROUND -->
+    <div class="interview-section">
+      <div class="interview-sec-head">Background: Euler's Constant \(\gamma\)</div>
+      <p>
+        Euler's constant is defined by
+        \[\gamma := \lim_{n\to\infty}\left(\sum_{k=1}^{n}\frac{1}{k} - \log n\right)\]
+        and its regular continued fraction expansion begins
+        \[\gamma = [0,1,1,2,1,2,1,4,3,13,5,1,1,8,1,2,4,1,1,40,1,11,3\ldots]\,.\]
+        Unlike \(e\) and \(\pi\), it is still unknown whether \(\gamma\) is rational or irrational — one of the most
+        celebrated open problems in mathematics.
+      </p>
+    </div>
+
+    <!-- Q&A BLOCK -->
+    <div class="interview-section">
+      <div class="interview-sec-head">The Story — in Conversation</div>
+
+      <div class="qa-block">
+        <div class="qa-label qa-label-c">Christopher</div>
+        <div class="qa-body">
+          <p>The beginning of this particular story takes place in Germany, over four decades ago — the year 1984, when Germany was a divided country. But behind the walls of the University of Hannover, Carsten Elsner was attending his very first lecture in number theory by Professor Rieger.</p>
+          <p>Carsten was curious and very pensive when it came to mathematical problems. While Prof. Rieger lectured on Euler's constant \(\gamma\) in the context of the asymptotic expansion of the harmonic series, Carsten was drawn towards its mysteries in the same way I had been drawn into the mysteries of the Zopf number \(\mathfrak{z} := [1,2,3,\ldots]\).</p>
+          <p>Carsten, can you tell me about some of the discussions with your professors on this topic and how they reacted to your goals of solving this problem?</p>
+        </div>
+      </div>
+
+      <div class="qa-block">
+        <div class="qa-label qa-label-e">Carsten</div>
+        <div class="qa-body">
+          <p>In 1984, I was a student focused solely on studying — not research, let alone tackling problems unsolved for centuries. Nevertheless, these problems were naturally fascinating. Only a few years had passed since Roger Apéry proved the irrationality of \(\zeta(3)\) in 1978. My mentor, Prof. Rieger, had discussed Apéry's proof with him personally and drew my attention to Alf van der Poorten's article "A proof that Euler missed" in <em>The Mathematical Intelligencer</em> (1979).</p>
+          <p>In seminars, I met Paul Erdős, who encouraged me to prove the irrationality of \(\sum_{n=0}^{\infty} \frac{1}{n!+1}\), and also Alan Baker in person. But I did not dare discuss a possible approach to proving the irrationality of \(\gamma\) with either of them — at the time, I felt they were way above my level as a student.</p>
+          <p>Later, shortly before completing my studies in 1987, I studied Roth's proof of the approximation of real-algebraic numbers by rationals. My mentor then handed me a copy of Paul Appell's 1926 paper <em>Sur la nature arithmétique de la constante d'Euler</em>, saying: "Perhaps you can correct the proof!" Unfortunately, Appell's proof contained a fundamental flaw, as he himself noted a few days later.</p>
+        </div>
+      </div>
+
+      <div class="qa-block">
+        <div class="qa-label qa-label-c">Christopher</div>
+        <div class="qa-body">
+          <p>Professor Rieger seemed supportive — enough to challenge you to correct the erroneous proof of Paul Appell. What amazes me is that Appell's proof had been read by mathematicians for decades before you saw it. The fact that \(\gamma\) is still not proven rational or irrational, even after Appell came so close, is a testament to its difficulty.</p>
+          <p>At this point, we have progressed another 4 decades from the time Carsten began pursuing this problem, and he has whittled it down to a single inequality. Carsten, can you describe a timeline of any critical milestones in your progress?</p>
+        </div>
+      </div>
+
+      <div class="qa-block">
+        <div class="qa-label qa-label-e">Carsten</div>
+        <div class="qa-body">
+          <p>I was never euphoric in my belief that I would reach the goal in the near future. However, it was frustrating when an approach failed, and motivating when I reached a milestone. Three such subgoals stand out:</p>
+          <ol style="margin:10px 0 10px 20px;line-height:1.9;font-size:0.93rem;color:var(--text-soft);">
+            <li>Estimating the solution of a mixed system of equations and inequalities based on an idea by P.G. Becker-Landeck (1988), proving linear independence of a linear form using subtle estimates of binomial coefficients.</li>
+            <li>Transforming a mixed system with large coefficients into a system where a small solution can be guaranteed, using a transformation matrix whose columns are basis vectors of a special lattice.</li>
+            <li>Basis reduction for a lattice where the resulting reduced basis consists only of vectors whose lengths do not differ too much from one another.</li>
+          </ol>
+          <p>Now there is still one missing piece: the proof of an inequality between the largest and smallest successive minima of a lattice. Numerical examples for the outstanding conjecture are encouraging, but they do not meet the required condition of very large parameter values, which would exceed the computational capabilities of computers. Another question also bothers me: no one has reviewed my work so far. Does it perhaps already contain fundamental errors that cannot be corrected? This uncertainty is indeed an emotional burden.</p>
+        </div>
+      </div>
+
+      <div class="qa-block">
+        <div class="qa-label qa-label-c">Christopher</div>
+        <div class="qa-body">
+          <p>Well, you have put 40 years of thought and work into this problem, and it sounds like fresh minds would be extremely useful. Today we make a "call to arms" — a challenge to any mathematician out there.</p>
+          <p>Carsten has made incredible progress. He has boiled the question of the irrationality of \(\gamma\) down to a single inequality. The full mathematical paper, <em>"Euler's Constant and Series Transformations with Bases of Balanced Lattices,"</em> is available for download above. In it, Carsten breaks the whole problem down and commences a near-complete proof — pending one remaining lemma (currently a conjecture) about a lattice inequality.</p>
+          <p><strong>Your mission, should you choose to accept it:</strong></p>
+          <ol style="margin:10px 0 10px 20px;line-height:1.9;font-size:0.93rem;color:var(--text-soft);">
+            <li>Read the paper. Don referee gloves and check for fundamental flaws.</li>
+            <li>Help Carsten solve his conjecture regarding the largest and smallest successive minima of a lattice.</li>
+          </ol>
+          <p>If you can contribute meaningfully as a collaborator or reviewer, email Carsten directly at <a href="mailto:carsten.elsner73@gmail.com">carsten.elsner73@gmail.com</a>.</p>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- THE CONJECTURE -->
+    <div class="interview-section">
+      <div class="interview-sec-head">The Outstanding Conjecture</div>
+      <p>
+        Carsten has formulated the missing piece precisely. The full statement is <strong>Lemma 13 (Third Fundamental Lemma; Conjecture)</strong> in the paper. In brief:
+      </p>
+
+      <div class="conjecture-card">
+        <div class="conjecture-label">Conjecture (Elsner, 2025)</div>
+        <p>
+          For infinitely many (very large) natural numbers \(N\), consider the \((N+1)\)-dimensional lattice \(\Lambda_N\) in \((N+2)\)-dimensional Euclidean space, defined as the solution lattice of a specific linear Diophantine equation. Let
+          \(\lambda_1 \leq \lambda_2 \leq \cdots \leq \lambda_{N+1}\)
+          be the successive minima of \(\Lambda_N\) with respect to the maximum norm.
+        </p>
+        <p style="margin-top:10px;">
+          Minkowski's second fundamental theorem gives
+          \[\lambda_1\lambda_2\cdots\lambda_{N+1} \leq d(\Lambda_N).\]
+          The conjecture asserts that for the specific lattices arising in Elsner's construction, the basis vectors satisfy the additional inequality
+          \[\sqrt{\lambda_{N+1}} < \lambda_1,\]
+          meaning that the lengths of the basis vectors do not differ too much from one another in the maximum norm.
+        </p>
+        <p style="margin-top:10px;font-size:0.88rem;color:var(--text-muted);">
+          If this conjecture is true, then <strong>Euler's constant \(\gamma\) is irrational</strong>.
+          Numerical verification (using the LLL algorithm) for small values \(N = 25, 31, 38\) confirms the inequality in all three cases; see Section 4.5 of the paper.
+        </p>
+      </div>
+
+      <p style="margin-top:18px;">
+        Carsten adds: <em>"I am familiar with many analytical properties of my lattices, but I suspect that to prove the inequality \(\sqrt{\lambda_{N+1}} &lt; \lambda_1\), additional arithmetic properties of the Diophantine equation generating the lattices must be taken into account. I am not a lattice expert, and at this point I am completely at a loss."</em>
+      </p>
+    </div>
+
+    <!-- CLOSING -->
+    <div class="interview-section">
+      <div class="interview-sec-head">What Would It Mean?</div>
+      <div class="qa-block">
+        <div class="qa-label qa-label-e">Carsten</div>
+        <div class="qa-body">
+          <p>In my lifetime, significant conjectures have been proven: the irrationality of \(\zeta(3)\), the Bieberbach conjecture, Fermat's Last Theorem, the Poincaré conjecture. These have been magnificent mathematical milestones. If someone were to join me in completing the proof of the irrationality of Euler's constant, it would be a spectacular conclusion of my own mathematical career.</p>
+          <p>In 1997, I had a monument erected at the site of Ferdinand von Lindemann's birthplace in Hannover to remember his magnificent contribution to proving the transcendence of \(\pi\). What matters is not so much <em>who</em> achieves a significant result, but that <em>we</em> achieve it — in accordance with Hilbert's statement:</p>
+          <blockquote class="math-quote">We must know — we will know.</blockquote>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     ERRATA TAB
+══════════════════════════════════════════ -->
+<div id="panel-errata" class="tab-panel" role="tabpanel">
+  <div class="errata-layout">
+
+    <div class="errata-book-ref">
+      <div class="errata-icon-circle">✎</div>
+      <div class="errata-ref-text">
+        <h2>Errata — <em>Continued Fractions</em> (Springer/Birkhäuser, 2025)</h2>
+        <p>Compiled by Christopher Robin Havens &amp; Carsten Elsner. Only corrections considered relevant to readers are listed.</p>
+      </div>
+    </div>
+
+    <!-- SIGNIFICANT -->
+    <div class="errata-section">
+      <div class="errata-sec-head">
+        <h3>Significant Errata</h3>
+        <span class="badge badge-sig">Requires Correction</span>
+      </div>
+
+      <div class="erratum sig">
+        <div class="erratum-top"><span class="erratum-loc">p. 29 · Proof of Theorem 1.1</span></div>
+        <div class="erratum-body">
+          <p>The first part of the proof is incorrect: the series mentioned do not exist. The beginning of the proof should be replaced as follows.</p>
+          <div class="correction-block"><span class="correction-label">Corrected proof opening</span>
+            Let \(\bar{\varphi} = (1-\sqrt{5})/2\) so that \(\bar{\varphi} = 1-\varphi\) and \(\varphi\bar{\varphi} = -1\).
+            \[\begin{aligned}
+              E(\varphi) &= \sum_{k\geqslant 0} |q_k\varphi - p_k| \\[4pt]
+                         &= \sum_{k\geqslant 0} (-1)^k(q_k\varphi - p_k) \\[4pt]
+                         &= \sum_{k\geqslant 0} (-1)^k(F_{k+1}\varphi - F_{k+2}) \\[4pt]
+                         &= \tfrac{1}{\sqrt{5}} \sum_{k\geqslant 0} (-1)^k\!\left(\bar{\varphi}^k + \bar{\varphi}^{k+2}\right) \\[4pt]
+                         &= \tfrac{\bar{\varphi}-\varphi}{\sqrt{5}} \sum_{k\geqslant 0} (-1)^k \bar{\varphi}^{k+1} \cdots
+            \end{aligned}\]
+          </div>
+        </div>
+      </div>
+
+      <div class="erratum sig">
+        <div class="erratum-top"><span class="erratum-loc">p. 62–63 · Definition 1.15 (last two equations &amp; assignment direction)</span></div>
+        <div class="erratum-body">
+          <p>The last two equations on page 62 are incorrect. On page 63 in the same definition, the assignment direction is reversed.</p>
+          <div class="correction-block"><span class="correction-label">Corrected equations (p. 62)</span>
+            \[\begin{aligned}
+              a_{\rho+\omega(k-1)} &= T_0(k),\quad \ldots,\quad a_{\rho+\omega k-1} = T_{\omega-1}(k) \\[4pt]
+              b_{\rho+\omega(k-1)} &= U_0(k),\quad \ldots,\quad b_{\rho+\omega k-1} = U_{\omega-1}(k)
+            \end{aligned}\]
+            Corrected (p. 63): \(\;b_{\rho-1}/a_{\rho-1} := a_0 \;\longrightarrow\; a_0 := b_{\rho-1}/a_{\rho-1}\)
+          </div>
+        </div>
+      </div>
+
+      <div class="erratum sig">
+        <div class="erratum-top"><span class="erratum-loc">p. 130 · Conjecture 2.1</span></div>
+        <div class="erratum-body">
+          <p>An incorrect symbol appears in the conjecture statement.</p>
+          <div class="correction-block"><span class="correction-label">Correction</span>
+            \(\mathcal{G}_n(\mathfrak{z}) \;\longrightarrow\; \mathcal{G}_n({\large\mathfrak{z}})\)
+          </div>
+        </div>
+      </div>
+
+      <div class="erratum sig">
+        <div class="erratum-top"><span class="erratum-loc">p. 159 · Proof of Proposition 3.1 — matrix entry</span></div>
+        <div class="erratum-body">
+          <p>The matrix in the proof has an incorrect top-right entry.</p>
+          <div class="correction-block"><span class="correction-label">Correction</span>
+            \[
+              \text{Incorrect:}\quad
+              \begin{pmatrix} p_n & q_{n-1} \\ q_n & q_{n-1} \end{pmatrix}
+              \qquad\qquad
+              \text{Correct:}\quad
+              \begin{pmatrix} p_n & p_{n-1} \\ q_n & q_{n-1} \end{pmatrix}
+            \]
+          </div>
+        </div>
+      </div>
+
+      <div class="erratum sig">
+        <div class="erratum-top"><span class="erratum-loc">p. 164 · Proof of Proposition 3.3 — omission after "(3.13)"</span></div>
+        <div class="erratum-body">
+          <p>There is a missing \(p_k\) term in the second line after "from (3.13) to obtain".</p>
+          <div class="correction-block"><span class="correction-label">Correction</span>
+            \[\begin{aligned}
+              \text{Incorrect:}\quad &+(-1)^{k-1}p_{k-2} + \bigl((-1)^{k-1} + (-1)^k\bigr) \\[4pt]
+              \text{Correct:}\quad   &+(-1)^{k-1}p_{k-2} + \bigl((-1)^{k-1} + (-1)^k\bigr)\, p_k
+            \end{aligned}\]
+          </div>
+        </div>
+      </div>
+
+      <div class="erratum sig">
+        <div class="erratum-top"><span class="erratum-loc">p. 166 · Proof of Proposition 3.4 — QED box placement</span></div>
+        <div class="erratum-body">
+          <p>The QED box (□) appears in the wrong location and should follow the final displayed equation ending with \(\dfrac{p_n \xi_{n+1} + p_{n-1}}{q_n \xi_{n+1} + q_{n-1}}\). The orphaned □ after equation (3.17) on the same page should be removed.</p>
+        </div>
+      </div>
+
+      <div class="erratum sig">
+        <div class="erratum-top"><span class="erratum-loc">p. 197 · Induction predicate &amp; equation (3.73)</span></div>
+        <div class="erratum-body">
+          <p>The predicate notation must be updated in both the surrounding text and the sum inside equation (3.73).</p>
+          <div class="correction-block"><span class="correction-label">Correction</span>
+            \(P(n) \;\longrightarrow\; P_n\)
+          </div>
+        </div>
+      </div>
+
+      <div class="erratum sig">
+        <div class="erratum-top"><span class="erratum-loc">p. 234–235 · Incorrect symbol \(\mathcal{S}\) subscript in equations from (22)</span></div>
+        <div class="erratum-body">
+          <p>An incorrect symbol appears at the bottom of page 234 and continues into the same computation on page 235.</p>
+          <div class="correction-block"><span class="correction-label">Correction</span>
+            \[\begin{aligned}
+              \text{Page 234:}\quad &\sigma\mathcal{S}_{\xi} \;\longrightarrow\; \sigma\mathcal{S}_{{\large\mathfrak{z}}} \\[4pt]
+              \text{Page 235:}\quad &\mathcal{S}_{\sigma(\xi)} \;\longrightarrow\; \mathcal{S}_{\sigma({\large\mathfrak{z}})}
+            \end{aligned}\]
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /significant -->
+
+    <!-- MINOR -->
+    <div class="errata-section">
+      <div class="errata-sec-head">
+        <h3>Minor Errata</h3>
+        <span class="badge badge-minor">Minor</span>
+      </div>
+
+      <div class="erratum minor">
+        <div class="erratum-top"><span class="erratum-loc">Table of Contents · Section starting p. 130</span></div>
+        <div class="erratum-body">
+          <p>A missing subsubsection number for the section <em>On the Approximation of z by Quadratic Convergents</em> (p. 130) causes the title to be absent from the table of contents.</p>
+        </div>
+      </div>
+
+      <div class="erratum minor">
+        <div class="erratum-top"><span class="erratum-loc">p. 166 · Missing section reference number</span></div>
+        <div class="erratum-body">
+          <p>A section number is absent. The text "given in Sect. can be rewritten in" should reference <strong>Section 3.1.1</strong>.</p>
+        </div>
+      </div>
+
+      <div class="erratum minor">
+        <div class="erratum-top"><span class="erratum-loc">p. 178 · Convergents terminology</span></div>
+        <div class="erratum-body">
+          <div class="correction-block"><span class="correction-label">Correction</span>
+            \[\begin{aligned}
+              \text{Incorrect:}\quad &\text{All the fractions } p_0/q_0,\; p_1/q_1 \text{ of } \ldots \\[4pt]
+              \text{Correct:}\quad   &\text{All the convergents } p_0/q_0,\; p_1/q_1,\; \ldots \text{ of } \ldots
+            \end{aligned}\]
+          </div>
+        </div>
+      </div>
+
+      <div class="erratum minor">
+        <div class="erratum-top"><span class="erratum-loc">pp. 295–296 · Table headers</span></div>
+        <div class="erratum-body">
+          <p>The symbol \((\omega, \vartheta)\) should appear in the column headers below \(Q_1\) on pages 295 and 296.</p>
+        </div>
+      </div>
+
+      <div class="erratum minor">
+        <div class="erratum-top"><span class="erratum-loc">Bibliography · Missing reference</span></div>
+        <div class="erratum-body">
+          <div class="correction-block"><span class="correction-label">Additional bibliographic entry</span>Carl Ludwig Siegel, "Über einige Anwendungen Diophantischer Approximationen,"
+Abh. Preuss. Akad. Wiss., Phys.-Math. Kl., 1929–1930, No. 1, pp. 1–70.</div>
+        </div>
+      </div>
+
+      <div class="erratum minor">
+        <div class="erratum-top"><span class="erratum-loc">p. 366 · Bibliographic entries 21 &amp; 22</span></div>
+        <div class="erratum-body">
+          <p>Three unnecessary spaces appear after Umlaut characters in entries 21 and 22 of the bibliography. These should be removed.</p>
+        </div>
+      </div>
+
+    </div><!-- /minor -->
+
+  </div>
+</div>
+
+</div><!-- /page-inner -->
+
+<footer>
+  <div class="footer-inner">
+    <div class="footer-left">
+      <strong>Continued Fractions</strong> — Elsner &amp; Havens<br>
+      Springer / Birkhäuser, 2025 · Open Access
+    </div>
+    <div class="footer-right">
+      <a href="https://prisonmathproject.org" target="_blank">Prison Mathematics Project</a>
+    </div>
+  </div>
+</footer>
+
+<script>
+  function switchTab(name) {
+    ['book','authors','interview','errata'].forEach(t => {
+      document.getElementById('tab-' + t).classList.toggle('active', t === name);
+      document.getElementById('panel-' + t).classList.toggle('active', t === name);
+    });
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+</script>
+</body>
+</html>
